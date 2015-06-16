@@ -1,0 +1,4 @@
+---
+BUNDLE_PATH: /Users/zhangerqiang/software/logstash-1.5.0/vendor/bundle
+BUNDLE_WITHOUT: build:development
+BUNDLE_GEMFILE: /Users/zhangerqiang/software/logstash-1.5.0/Gemfile

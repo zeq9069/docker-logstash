@@ -1,0 +1,63 @@
+
+    logstash日志收集系统
+
+利用logstash + elasticsearch（logstash内嵌）+ kibana + redis + Docker 去统一收集Docker容器生成的日志
+
+
+1，构建docker image
+
+  利用dockerfile_tmp目录下的文件去构建 Docker image
+
+    例如：
+
+      cd dockerfile_tmp
+
+      docker build --tag="kyrin/logs:v1" .
+
+2,启动logstash + elasticsearch + redis + kibana Docker容器
+
+    通过上一步，我们就已经把包含有logstash + elasticsearch + redis + kibana 的image 构建好了，接下来，我们
+ 就是去启动容器了。
+
+    例如：
+      
+      docker run -d -P --name="logs" kyrin/logs:v1 
+
+OK~~~这样就算是启动起来了~~
+
+3，收集物理机上的docker日志  /var/lib/docker/containers/{container_ID}/{container_ID}-json.log
+   (一定要有权限访问该目录)
+   物理机上的Docker容器运行的日志都会存放在物理机目录/var/lib/docker/containers/ 下，文件夹以对用的容器ID命名。
+
+我们需要将物理机下的日志收集在一起，统一放入redis中。首先，我们更改本目录下的logstash-1.5.0中的test-boot2docker.conf文件
+
+修改input、filter、output相关模块，使其符合自己的要求。注意：output一定要使用redis,并且port一定是docker映射后的那个port。然后，启动logstash即可！ 
+  例如：
+    
+    cd logstash-1.5.0 
+    ./bin/logstash -f test-boot2docker.conf
+
+
+4，访问
+
+  你可以在物理机下访问被映射后的9200，5601端口了~~~~
+
+  如：
+   
+    http://localhost:9200
+    http://localhost:5601
+
+5,收集多台物理主机上的docker日志
+
+  一台物理机的搭建好了，多台也就没什么问题了~~~
+比如，有个B机器上的Docker日志要收集，你就可以在B机器上安装好logstash，配置好test-boot2docker.conf，注意output的配置，只需要将output中redis 的相关配置指定到A机器上的redis服务上就可以了~~~  
+
+
+
+   
+  
+  
+     
+
+ 
+
